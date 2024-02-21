@@ -1,11 +1,16 @@
 name: CI/CD
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to deploy'
         required: true
+        default: 'main'
+        choices: ['main', 'develop']
 
 jobs:
   build:
@@ -33,14 +38,22 @@ jobs:
     - name: Set AKS Cluster Name and IP Address
       id: set-cluster-name-ip
       run: |
-        if [ "${{ github.event.inputs.branch }}" == "master" ]; then
-          echo "::set-output name=cluster-name::master-cluster"
-          echo "::set-output name=cluster-ip::10.10.10.1"  # Example IP Address for master cluster
-          echo "::set-output name=resource-group::master-aks-resource-group"
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          if [ "${{ github.event.inputs.branch }}" == "main" ]; then
+            echo "::set-output name=cluster-name::main-cluster"
+            echo "::set-output name=cluster-ip::10.10.10.1"  # Example IP Address for main cluster
+            echo "::set-output name=resource-group::main-aks-resource-group"
+          else
+            echo "::set-output name=cluster-name::develop-cluster"
+            echo "::set-output name=cluster-ip::10.10.10.2"  # Example IP Address for develop cluster
+            echo "::set-output name=resource-group::develop-aks-resource-group"
+          fi
         else
-          echo "::set-output name=cluster-name::develop-cluster"
-          echo "::set-output name=cluster-ip::10.10.10.2"  # Example IP Address for develop cluster
-          echo "::set-output name=resource-group::develop-aks-resource-group"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "::set-output name=cluster-name::main-cluster"
+            echo "::set-output name=cluster-ip::10.10.10.1"  # Example IP Address for main cluster
+            echo "::set-output name=resource-group::main-aks-resource-group"
+          fi
         fi
 
     - name: Azure AKS Set Context
@@ -55,6 +68,7 @@ jobs:
         kubectl apply -f kubernetes/node-deployment.yaml
         echo "Application deployed to AKS Cluster: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}"
         echo "AKS Cluster IP Address: ${{ steps.set-cluster-name-ip.outputs.cluster-ip }}"
+
 
 
 
