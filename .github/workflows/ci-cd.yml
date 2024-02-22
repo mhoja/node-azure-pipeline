@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to deploy'
+        description: 'Branch to deploy...'
         required: true
        
 
@@ -64,12 +64,11 @@ jobs:
         cluster-name: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}
         resource-group: ${{ steps.set-cluster-name-ip.outputs.resource-group }}
 
-    - name: Deploy Node App to AKS
+    - name: Deploy Node App to Azure Kubernates service(AKS)
       run: |
         kubectl apply -f kubernetes/node-deployment.yaml
         echo "Application deployed to AKS Cluster: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}"
         echo "AKS Cluster IP Address: ${{ steps.set-cluster-name-ip.outputs.cluster-ip }}"
-
 
 
 
