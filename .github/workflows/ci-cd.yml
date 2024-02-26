@@ -10,7 +10,6 @@ on:
       branch:
         description: 'Branch to deploy...'
         required: true
-       
 
 jobs:
   build:
@@ -64,13 +63,21 @@ jobs:
         cluster-name: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}
         resource-group: ${{ steps.set-cluster-name-ip.outputs.resource-group }}
 
-    - name: Deploy Node App to Azure Kubernates service(AKS)
+    - name: Deploy Node App to Azure Kubernetes Service (AKS)
       run: |
-        kubectl apply -f kubernetes/node-deployment.yaml
+        kubectl apply -f k8s/deployment.yaml
         echo "Application deployed to AKS Cluster: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}"
         echo "AKS Cluster IP Address: ${{ steps.set-cluster-name-ip.outputs.cluster-ip }}"
 
+    - name: Deploy Node App Service to Azure Kubernetes Service (AKS)
+      run: |
+        kubectl apply -f k8s/service.yaml
+        echo "Service deployed to AKS Cluster: ${{ steps.set-cluster-name-ip.outputs.cluster-name }}"
 
+
+#Add logic to stop the existing cluster
+#To keep the old cluster image
+#To delete the older cluster images
 
 
 # name: CI/CD
